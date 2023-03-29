@@ -1,0 +1,17 @@
+#Spring configuration
+server:
+  port: 8081
+
+#Postgres configuration
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/events?createDatabaseIfNotExist=true
+    username: root
+    password: Root123
+  jpa:
+    show-sql: true
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQL81Dialect
