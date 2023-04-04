@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import java.io.IOException;
 import java.util.List;
 
 @RequestMapping("/event")
@@ -18,6 +19,10 @@ public interface EventApi {
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     EventDto getEvent(@PathVariable @Min(1) long id);
+
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    EventDto updateEvent(@PathVariable @Min(1) long id, @RequestBody EventDto eventDto);
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)

@@ -25,6 +25,11 @@ public class TicketController implements TicketApi {
     }
 
     @Override
+    public TicketDto updateTicket(long id, TicketDto ticketDto) {
+        return ticketService.update(id, ticketDto);
+    }
+
+    @Override
     public List<TicketDto> getTicketList() {
         return ticketService.findAll();
     }

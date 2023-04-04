@@ -1,6 +1,7 @@
 package com.event.core.service.impl;
 
 import com.event.core.dto.EventDto;
+import com.event.core.exception.EntityNotFoundException;
 import com.event.core.mapper.EventMapper;
 import com.event.core.model.Event;
 import com.event.core.repository.EventRepository;
@@ -31,20 +32,27 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventDto findById(long id) {
-        Event event = eventRepository.findById(id).orElseThrow();
-        log.info("Get EVENT with id: [{}]", event);
-        log.debug("Get EVENT: [{}]", event.getId());
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Event.class, id));
+        log.info("Get EVENT with id: [{}]", event.getId());
+        log.debug("Get EVENT: [{}]", event);
 
         return EventMapper.INSTANCE.eventMapToEventDto(event);
     }
 
     @Override
-    public EventDto update(EventDto eventDto) {
-        Event event = EventMapper.INSTANCE.eventDtoMapToEvent(eventDto);
+    public EventDto update(long id, EventDto eventDto) {
+        Event eventToUpdate = eventRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Event.class, id));
 
-        Event updatedEvent = eventRepository.save(event);
-        log.info("Update EVENT with id: [{}]", updatedEvent);
-        log.debug("Update EVENT: [{}]", updatedEvent.getId());
+        eventToUpdate.setName(eventDto.getName());
+        eventToUpdate.setDescription(eventDto.getDescription());
+        eventToUpdate.setPlace(eventDto.getPlace());
+        eventToUpdate.setPrice(eventDto.getPrice());
+
+        Event updatedEvent = eventRepository.save(eventToUpdate);
+        log.info("Update EVENT with id: [{}]", updatedEvent.getId());
+        log.debug("Update EVENT: [{}]", updatedEvent);
 
         return EventMapper.INSTANCE.eventMapToEventDto(updatedEvent);
     }

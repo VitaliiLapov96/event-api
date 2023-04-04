@@ -1,7 +1,6 @@
 package com.event.core.controller.api;
 
 import com.event.core.dto.TicketDto;
-import com.event.core.model.Category;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,13 +19,13 @@ public interface TicketApi {
     @ResponseStatus(HttpStatus.OK)
     TicketDto getTicket(@PathVariable @Min(1) long id);
 
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    TicketDto updateTicket(@PathVariable @Min(1) long id, @RequestBody TicketDto ticketDto);
+
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     List<TicketDto> getTicketList();
-
-//    @GetMapping'
-//    @ResponseStatus(HttpStatus.OK)
-//    List<TicketD'to> getTicketListByCategory(@RequestParam Category category);
 
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.OK)

@@ -10,7 +10,7 @@ public interface EventService {
 
     EventDto findById(long id);
 
-    EventDto update(EventDto eventDto);
+    EventDto update(long id, EventDto eventDto);
 
     List<EventDto> findAll();
 

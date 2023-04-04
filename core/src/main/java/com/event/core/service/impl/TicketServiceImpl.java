@@ -1,7 +1,10 @@
 package com.event.core.service.impl;
 
 import com.event.core.dto.TicketDto;
+import com.event.core.exception.EntityNotFoundException;
+import com.event.core.mapper.EventMapper;
 import com.event.core.mapper.TicketMapper;
+import com.event.core.model.Event;
 import com.event.core.model.Ticket;
 import com.event.core.repository.TicketRepository;
 import com.event.core.service.TicketService;
@@ -33,20 +36,27 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public TicketDto findById(long id) {
-        Ticket ticket = ticketRepository.findById(id).orElseThrow();
-        log.info("Get TICKET with id: [{}]", ticket);
-        log.debug("Get TICKET: [{}]", ticket.getId());
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Ticket.class, id));
+
+        log.info("Get TICKET with id: [{}]", ticket.getId());
+        log.debug("Get TICKET: [{}]", ticket);
 
         return TicketMapper.INSTANCE.ticketMapToTicketDto(ticket);
     }
 
     @Override
-    public TicketDto update(TicketDto ticketDto) {
-        Ticket ticket = TicketMapper.INSTANCE.ticketDtoMapToTicket(ticketDto);
+    public TicketDto update(long id, TicketDto ticketDto) {
+        Ticket ticketToUpdate = ticketRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Ticket.class, id));
 
-        Ticket updatedTicket = ticketRepository.save(ticket);
-        log.info("Update TICKET with id: [{}]", updatedTicket);
-        log.debug("Update TICKET: [{}]", updatedTicket.getId());
+        Event event = EventMapper.INSTANCE.eventDtoMapToEvent(ticketDto.getEvent());
+        ticketToUpdate.setEvent(event);
+        ticketToUpdate.setCategory(ticketDto.getCategory());
+
+        Ticket updatedTicket = ticketRepository.save(ticketToUpdate);
+        log.info("Update TICKET with id: [{}]", updatedTicket.getId());
+        log.debug("Update TICKET: [{}]", updatedTicket);
 
         return TicketMapper.INSTANCE.ticketMapToTicketDto(updatedTicket);
     }

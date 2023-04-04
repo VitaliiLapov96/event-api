@@ -1,7 +1,6 @@
 package com.event.core.service;
 
 import com.event.core.dto.TicketDto;
-import com.event.core.model.Category;
 
 import java.util.List;
 
@@ -11,7 +10,7 @@ public interface TicketService {
 
     TicketDto findById(long id);
 
-    TicketDto update(TicketDto ticketDto);
+    TicketDto update(long id, TicketDto ticketDto);
 
     List<TicketDto> findAll();
 
