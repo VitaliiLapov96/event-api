@@ -6,11 +6,6 @@ import com.event.core.service.EventService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.List;
 
 @RestController
@@ -27,18 +22,6 @@ public class EventController implements EventApi {
     @Override
     public EventDto getEvent(long id) {
         return eventService.findById(id);
-    }
-
-    @Override
-    public void getCompletedEvent() throws IOException, InterruptedException {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://seatgeek-seatgeekcom.p.rapidapi.com/taxonomies"))
-                .header("X-RapidAPI-Key", "83779ba167msh7eb3e0600fb42a1p1a9979jsnc6696f665af6")
-                .header("X-RapidAPI-Host", "seatgeek-seatgeekcom.p.rapidapi.com")
-                .method("GET", HttpRequest.BodyPublishers.noBody())
-                .build();
-        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response.body());
     }
 
     @Override
