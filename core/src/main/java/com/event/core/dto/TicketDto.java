@@ -1,13 +1,13 @@
 package com.event.core.dto;
 
 import com.event.core.model.Category;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
+@Accessors(chain = true)
 public class TicketDto {
 
     private long id;

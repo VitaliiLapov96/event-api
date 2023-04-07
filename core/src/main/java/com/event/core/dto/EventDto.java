@@ -1,12 +1,12 @@
 package com.event.core.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.time.LocalDate;
 
-@Getter
-@Setter
+@Data
+@Accessors(chain = true)
 public class EventDto {
 
     private long id;
