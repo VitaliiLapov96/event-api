@@ -1,12 +1,10 @@
 package com.event.core.controller;
 
-import com.event.core.dto.EventDto;
 import com.event.core.dto.TicketDto;
-import com.event.core.model.Category;
+import com.event.core.model.Event;
+import com.event.core.model.Ticket;
 import com.event.core.repository.EventRepository;
 import com.event.core.repository.TicketRepository;
-import com.event.core.service.EventService;
-import com.event.core.service.TicketService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,11 +16,12 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
-import static com.event.core.util.TestUtil.buildDefaultEventDto;
-import static com.event.core.util.TestUtil.buildDefaultTicketDto;
-import static com.event.core.util.TestUtil.buildDefaultTicketDtoWithCustomId;
+import static com.event.core.util.TestUtil.buildDefaultEvent;
+import static com.event.core.util.TestUtil.buildDefaultTicketDtoWithCustomEventId;
+import static com.event.core.util.TestUtil.buildDefaultTicketWithCustomEventId;
+import static com.event.core.util.TestUtil.buildDefaultToUpdateTicketDtoWithCustomEventId;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -37,15 +36,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class TicketControllerTest {
 
-    private static final EventDto EVENT_DTO = buildDefaultEventDto();
-
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private TicketService ticketService;
-    @Autowired
-    private EventService eventService;
 
     @Autowired
     private TicketRepository ticketRepository;
@@ -64,8 +56,8 @@ class TicketControllerTest {
     @Test
     void createTicket() throws Exception {
         // given
-        TicketDto expectedTicketDto = buildDefaultTicketDto();
-        eventService.create(EVENT_DTO);
+        Event savedEvent = eventRepository.save(buildDefaultEvent());
+        TicketDto expectedTicketDto = buildDefaultTicketDtoWithCustomEventId(savedEvent.getId());
 
         // when
         ResultActions response = mockMvc.perform(post("/ticket")
@@ -81,18 +73,16 @@ class TicketControllerTest {
     @Test
     void getTicket() throws Exception {
         // given
-        TicketDto expectedTicketDto = buildDefaultTicketDto();
-
-        eventService.create(EVENT_DTO);
-        ticketService.create(expectedTicketDto);
+        Event savedEvent = eventRepository.save(buildDefaultEvent());
+        Ticket savedTicket = ticketRepository.save(buildDefaultTicketWithCustomEventId(savedEvent.getId()));
 
         // when
-        ResultActions response = mockMvc.perform(get("/ticket/{id}", expectedTicketDto.getId()));
+        ResultActions response = mockMvc.perform(get("/ticket/{id}", savedTicket.getId()));
 
         // then
         response.andExpect(status().isOk())
                 .andDo(print())
-                .andExpect(jsonPath("$.category", is(expectedTicketDto.getCategory().toString())));
+                .andExpect(jsonPath("$.category", is(savedTicket.getCategory().toString())));
     }
 
     @Test
@@ -110,15 +100,13 @@ class TicketControllerTest {
     @Test
     void updateTicket() throws Exception {
         // given
-        TicketDto expectedTicketDto = buildDefaultTicketDto();
+        Event savedEvent = eventRepository.save(buildDefaultEvent());
+        Ticket savedTicket = ticketRepository.save(buildDefaultTicketWithCustomEventId(savedEvent.getId()));
 
-        eventService.create(EVENT_DTO);
-        ticketService.create(expectedTicketDto);
-
-        TicketDto ticketDtoToUpdate = buildDefaultToUpdateTicketDto();
+        TicketDto ticketDtoToUpdate = buildDefaultToUpdateTicketDtoWithCustomEventId(savedEvent.getId());
 
         // when
-        ResultActions response = mockMvc.perform(put("/ticket/{id}", expectedTicketDto.getId())
+        ResultActions response = mockMvc.perform(put("/ticket/{id}", savedTicket.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(ticketDtoToUpdate)));
 
@@ -129,17 +117,35 @@ class TicketControllerTest {
     }
 
     @Test
+    void getTicketListByEventId() throws Exception {
+        // given
+        Event savedEvent = eventRepository.save(buildDefaultEvent());
+
+        List<Ticket> ticketList = List.of(buildDefaultTicketWithCustomEventId(savedEvent.getId()),
+                buildDefaultTicketWithCustomEventId(savedEvent.getId()),
+                buildDefaultTicketWithCustomEventId(savedEvent.getId()));
+        List<Ticket> savedTicketList = ticketRepository.saveAll(ticketList);
+
+        // when
+        ResultActions response =
+                mockMvc.perform(get("/ticket/search?eventId={eventId}", savedEvent.getId()));
+
+        // then
+        response.andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.size()",
+                        is(savedTicketList.size())));
+    }
+
+    @Test
     void getTicketList() throws Exception {
         // given
-        TicketDto expectedTicketDto1 = buildDefaultTicketDtoWithCustomId(1L);
-        TicketDto expectedTicketDto2 = buildDefaultTicketDtoWithCustomId(2L);
-        TicketDto expectedTicketDto3 = buildDefaultTicketDtoWithCustomId(3L);
+        Event savedEvent = eventRepository.save(buildDefaultEvent());
 
-        eventService.create(EVENT_DTO);
-
-        ticketService.create(expectedTicketDto1);
-        ticketService.create(expectedTicketDto2);
-        ticketService.create(expectedTicketDto3);
+        List<Ticket> ticketList = List.of(buildDefaultTicketWithCustomEventId(savedEvent.getId()),
+                buildDefaultTicketWithCustomEventId(savedEvent.getId()),
+                buildDefaultTicketWithCustomEventId(savedEvent.getId()));
+        ticketRepository.saveAll(ticketList);
 
         // when
         ResultActions response = mockMvc.perform(get("/ticket"));
@@ -154,28 +160,15 @@ class TicketControllerTest {
     @Test
     void deleteTicket() throws Exception {
         // given
-        TicketDto expectedTicketDto = buildDefaultTicketDto();
-
-        eventService.create(EVENT_DTO);
-        ticketService.create(expectedTicketDto);
+        Event savedEvent = eventRepository.save(buildDefaultEvent());
+        Ticket savedTicket = ticketRepository.save(buildDefaultTicketWithCustomEventId(savedEvent.getId()));
 
         // when
-        ResultActions response = mockMvc.perform(delete("/ticket/{id}", expectedTicketDto.getId()));
+        ResultActions response = mockMvc.perform(delete("/ticket/{id}", savedTicket.getId()));
 
         // then
         response.andExpect(status().isOk())
                 .andDo(print());
-    }
-
-    private static TicketDto buildDefaultToUpdateTicketDto() {
-        return new TicketDto() {
-            {
-                setId(1);
-                setCategory(Category.PREMIUM);
-                setEvent(EVENT_DTO);
-                setCreatedDate(LocalDateTime.now());
-            }
-        };
     }
 
 }

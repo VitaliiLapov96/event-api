@@ -1,8 +1,8 @@
 package com.event.core.controller;
 
 import com.event.core.dto.EventDto;
+import com.event.core.model.Event;
 import com.event.core.repository.EventRepository;
-import com.event.core.service.EventService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,12 +14,16 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.time.LocalDate;
+import java.util.List;
 
+import static com.event.core.util.TestUtil.buildDefaultEvent;
 import static com.event.core.util.TestUtil.buildDefaultEventDto;
-import static com.event.core.util.TestUtil.buildDefaultEventDtoWithCustomId;
+import static com.event.core.util.TestUtil.buildDefaultToUpdateEventDto;
 import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -32,8 +36,6 @@ class EventControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private EventService eventService;
     @Autowired
     private EventRepository eventRepository;
 
@@ -67,19 +69,18 @@ class EventControllerTest {
     @Test
     void getEvent() throws Exception {
         // given
-        EventDto expectedEventDto = buildDefaultEventDto();
-        eventService.create(expectedEventDto);
+        Event expectedEvent = eventRepository.save(buildDefaultEvent());
 
         // when
-        ResultActions response = mockMvc.perform(get("/event/{id}", expectedEventDto.getId()));
+        ResultActions response = mockMvc.perform(get("/event/{id}", expectedEvent.getId()));
 
         // then
         response.andExpect(status().isOk())
                 .andDo(print())
-                .andExpect(jsonPath("$.name", is(expectedEventDto.getName())))
-                .andExpect(jsonPath("$.description", is(expectedEventDto.getDescription())))
-                .andExpect(jsonPath("$.place", is(expectedEventDto.getPlace())))
-                .andExpect(jsonPath("$.price", is(expectedEventDto.getPrice())));
+                .andExpect(jsonPath("$.name", is(expectedEvent.getName())))
+                .andExpect(jsonPath("$.description", is(expectedEvent.getDescription())))
+                .andExpect(jsonPath("$.place", is(expectedEvent.getPlace())))
+                .andExpect(jsonPath("$.price", is(expectedEvent.getPrice())));
     }
 
     @Test
@@ -97,13 +98,12 @@ class EventControllerTest {
     @Test
     void updateEvent() throws Exception {
         // given
-        EventDto expectedEventDto = buildDefaultEventDto();
-        eventService.create(expectedEventDto);
+        Event expectedEvent = eventRepository.save(buildDefaultEvent());
 
         EventDto eventDtoToUpdate = buildDefaultToUpdateEventDto();
 
         // when
-        ResultActions response = mockMvc.perform(put("/event/{id}", expectedEventDto.getId())
+        ResultActions response = mockMvc.perform(put("/event/{id}", expectedEvent.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(eventDtoToUpdate)));
 
@@ -119,13 +119,9 @@ class EventControllerTest {
     @Test
     void getEventList() throws Exception {
         // given
-        EventDto expectedEventDto1 = buildDefaultEventDtoWithCustomId(1L);
-        EventDto expectedEventDto2 = buildDefaultEventDtoWithCustomId(2L);
-        EventDto expectedEventDto3 = buildDefaultEventDtoWithCustomId(3L);
-
-        eventService.create(expectedEventDto1);
-        eventService.create(expectedEventDto2);
-        eventService.create(expectedEventDto3);
+        List<Event> eventList = List.of(buildDefaultEvent(),
+                buildDefaultEvent(), buildDefaultEvent());
+        eventRepository.saveAll(eventList);
 
         // when
         ResultActions response = mockMvc.perform(get("/event"));
@@ -140,28 +136,14 @@ class EventControllerTest {
     @Test
     void deleteEvent() throws Exception {
         // given
-        EventDto expectedEventDto = buildDefaultEventDto();
-        eventService.create(expectedEventDto);
+        Event savedEvent = eventRepository.save(buildDefaultEvent());
 
         // when
-        ResultActions response = mockMvc.perform(delete("/event/{id}", expectedEventDto.getId()));
+        ResultActions response = mockMvc.perform(delete("/event/{id}", savedEvent.getId()));
 
         // then
         response.andExpect(status().isOk())
                 .andDo(print());
-    }
-
-    private static EventDto buildDefaultToUpdateEventDto() {
-        return new EventDto() {
-            {
-                setId(1L);
-                setName("Ballet");
-                setDescription("Big ballet concert");
-                setPrice(100.0);
-                setPlace("Kyiv, Volodymyrska Street, 50");
-                setDate(LocalDate.now());
-            }
-        };
     }
 
 }
