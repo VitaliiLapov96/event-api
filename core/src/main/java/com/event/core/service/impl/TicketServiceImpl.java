@@ -71,6 +71,15 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
+    public List<TicketDto> findAllByEventId(long eventId) {
+        List<Ticket> tickets = ticketRepository.findAllByEventId(eventId);
+        log.info("Fetch TICKET list: size [{}]", tickets.size());
+        log.debug("Fetch TICKET list: {}", tickets);
+
+        return TicketMapper.INSTANCE.ticketListMapToTicketDtoList(tickets);
+    }
+
+    @Override
     public void deleteById(long id) {
         ticketRepository.deleteById(id);
         log.info("Delete TICKET by id: [{}]", id);

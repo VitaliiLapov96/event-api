@@ -27,6 +27,10 @@ public interface TicketApi {
     @ResponseStatus(HttpStatus.OK)
     List<TicketDto> getTicketList();
 
+    @GetMapping("/search")
+    @ResponseStatus(HttpStatus.OK)
+    List<TicketDto> getTicketListByEventId(@RequestParam long eventId);
+
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.OK)
     void deleteTicket(@PathVariable @Min(1) long id);

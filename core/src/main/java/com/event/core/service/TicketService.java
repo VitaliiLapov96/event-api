@@ -14,5 +14,7 @@ public interface TicketService {
 
     List<TicketDto> findAll();
 
+    List<TicketDto> findAllByEventId(long eventId);
+
     void deleteById(long id);
 }

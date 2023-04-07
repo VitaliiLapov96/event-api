@@ -35,6 +35,11 @@ public class TicketController implements TicketApi {
     }
 
     @Override
+    public List<TicketDto> getTicketListByEventId(long eventId) {
+        return ticketService.findAllByEventId(eventId);
+    }
+
+    @Override
     public void deleteTicket(long id) {
         ticketService.deleteById(id);
     }
