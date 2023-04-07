@@ -73,7 +73,7 @@ class EventServiceImplTest {
     @Test
     void shouldThrowExceptionWhenEventIsNotFound() {
         //given
-        String expectedExceptionMsg = "FAILED to find Event: 1";
+        String expectedExceptionMsg = "FAILED to find Event with id: 1";
 
         when(eventRepository.findById(MOCK_ID)).thenReturn(Optional.empty());
 
@@ -105,9 +105,9 @@ class EventServiceImplTest {
     @Test
     void findAllEvents() {
         // given
-        List<Event> expectedEventList = List.of(buildDefaultEventWithCustomId(1L),
-                buildDefaultEventWithCustomId(2L),
-                buildDefaultEventWithCustomId(3L));
+        List<Event> expectedEventList = List.of(buildDefaultEventWithCustomId(1),
+                buildDefaultEventWithCustomId(2),
+                buildDefaultEventWithCustomId(3));
         when(eventRepository.findAll()).thenReturn(expectedEventList);
 
         // when

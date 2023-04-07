@@ -66,7 +66,7 @@ class TicketServiceImplTest {
     @Test
     void shouldThrowExceptionWhenTicketIsNotFound() {
         //given
-        String expectedExceptionMsg = "FAILED to find Ticket: 1";
+        String expectedExceptionMsg = "FAILED to find Ticket with id: 1";
 
         when(ticketRepository.findById(MOCK_ID)).thenReturn(Optional.empty());
 
@@ -96,7 +96,7 @@ class TicketServiceImplTest {
     }
 
     @Test
-    void findAllTickets() {
+    void shouldFindAllTickets() {
         // given
         List<Ticket> expectedTicketList = List.of(buildDefaultTicketWithCustomId(1L),
                 buildDefaultTicketWithCustomId(2L),
@@ -105,6 +105,29 @@ class TicketServiceImplTest {
 
         // when
         List<TicketDto> actualTicketDtoList = ticketService.findAll();
+
+        // then
+        List<Long> expectedTicketIdList = expectedTicketList.stream()
+                .map(Ticket::getId)
+                .collect(Collectors.toList());
+        List<Long> actualTicketDtoIdList = actualTicketDtoList.stream()
+                .map(TicketDto::getId)
+                .collect(Collectors.toList());
+
+        assertEquals(expectedTicketList.size(), actualTicketDtoList.size());
+        assertEquals(expectedTicketIdList, actualTicketDtoIdList);
+    }
+
+    @Test
+    void shouldFindAllTicketsByEventId() {
+        // given
+        List<Ticket> expectedTicketList = List.of(buildDefaultTicketWithCustomId(1L),
+                buildDefaultTicketWithCustomId(2L),
+                buildDefaultTicketWithCustomId(3L));
+        when(ticketRepository.findAllByEventId(MOCK_ID)).thenReturn(expectedTicketList);
+
+        // when
+        List<TicketDto> actualTicketDtoList = ticketService.findAllByEventId(MOCK_ID);
 
         // then
         List<Long> expectedTicketIdList = expectedTicketList.stream()
