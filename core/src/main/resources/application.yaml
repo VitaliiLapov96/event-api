@@ -1,9 +1,13 @@
 #Spring configuration
 server:
   port: 8080
+  servlet:
+    context-path: /event-app
 
-#MySQL configuration
+#App name/Postgres configuration
 spring:
+  application:
+    name: event-app
   datasource:
     driver-class-name: org.postgresql.Driver
     url: ${MY_POSTGRES_URL}
@@ -15,4 +19,10 @@ spring:
       ddl-auto: update
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQL81Dialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+#Eureka configuration
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URL}

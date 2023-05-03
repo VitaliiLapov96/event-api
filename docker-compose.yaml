@@ -1,7 +1,39 @@
 version: '2'
 
 services:
-  app:
+  zipkin:
+    image: openzipkin/zipkin
+    ports:
+      - "9411:9411"
+
+  graphite:
+    image: graphiteapp/graphite-statsd
+    ports:
+      - "2003:2003"
+
+  discovery:
+    image: 'discovery:latest'
+    build:
+      context: ./discovery
+      dockerfile: Dockerfile
+    container_name: discovery
+    ports:
+      - "8761:8761"
+
+  apigateway:
+    image: 'apigateway:latest'
+    build:
+      context: ./apigateway
+      dockerfile: Dockerfile
+    container_name: apigateway
+    environment:
+      - EUREKA_URL=http://discovery:8761/eureka
+    ports:
+      - "8764:8764"
+    depends_on:
+      - discovery
+
+  event-app:
     image: 'event-core:latest'
     build:
       context: ./core
@@ -11,10 +43,14 @@ services:
       - "8080:8080"
     depends_on:
       - db
+      - discovery
+      - zipkin
+      - graphite
     environment:
       - MY_POSTGRES_URL=jdbc:postgresql://db:5432/events
       - USERNAME=postgres
       - PASSWORD=postgres
+      - EUREKA_URL=http://discovery:8761/eureka
 
   db:
     image: 'postgres:13.1-alpine'
@@ -25,3 +61,15 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=events
+
+#  discovery:
+#    build: ../event-app/discovery/target/docker
+#    ports:
+#      - "8761:8761"
+#
+#  apigateway:
+#    build: ../event-app/apigateway/target/docker
+#    ports:
+#      - "8764:8764"
+#    links:
+#      - discovery

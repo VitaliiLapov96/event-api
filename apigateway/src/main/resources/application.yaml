@@ -1,0 +1,21 @@
+#Spring configuration
+server:
+  port: 8764
+
+#App name configuration
+spring:
+  application:
+    name: apigateway
+
+#Zuul configuration
+zuul:
+  routes:
+    event-app:
+      path: /event-app/**
+      url: http://localhost:8080/event-app
+
+#Eureka configuration
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URL}
