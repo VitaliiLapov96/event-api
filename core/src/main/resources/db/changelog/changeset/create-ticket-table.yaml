@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-ticket
+      author: Vitalii Lapov
+      changes:
+        - createTable:
+            tableName: ticket
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: category
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_date
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: event_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: event_article_fk
+                    referencedTableName: event
+                    referencedColumnNames: id
