@@ -1,6 +1,7 @@
 package com.event.core.controller.advice;
 
 import com.event.core.exception.EntityNotFoundException;
+import com.event.core.exception.EventCoreException;
 import com.event.core.model.ErrorType;
 import com.event.core.model.EventServiceError;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,17 @@ public class ErrorHandler {
                 .setHttpStatus(HttpStatus.NOT_FOUND)
                 .setLocalDateTime(LocalDateTime.now())
                 .setErrorType(ErrorType.ENTITY_NOT_FOUND);
+    }
+
+    @ExceptionHandler(EventCoreException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public EventServiceError handleEventCoreException(EventCoreException exception) {
+        log.error("eventCoreException: exception {}", exception.getMessage(), exception);
+
+        return new EventServiceError().setMessage(exception.getMessage())
+                .setHttpStatus(HttpStatus.BAD_REQUEST)
+                .setLocalDateTime(LocalDateTime.now())
+                .setErrorType(ErrorType.EVENT_APP_ERROR);
     }
 
 }

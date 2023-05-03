@@ -28,6 +28,7 @@
         <liquibase.version>4.21.1</liquibase.version>
         <netflix.servo.version>0.13.2</netflix.servo.version>
         <neflix.cloud.version>2.2.10.RELEASE</neflix.cloud.version>
+        <guava.version>31.1-jre</guava.version>
     </properties>
 
     <modules>

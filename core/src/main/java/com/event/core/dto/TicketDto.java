@@ -1,5 +1,6 @@
 package com.event.core.dto;
 
+import com.event.core.model.Account;
 import com.event.core.model.Category;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -13,6 +14,8 @@ public class TicketDto {
     private long id;
 
     private EventDto event;
+
+    private AccountDto account;
 
     private Category category;
 

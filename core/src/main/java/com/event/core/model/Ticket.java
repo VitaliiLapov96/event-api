@@ -25,6 +25,10 @@ public class Ticket {
     @JoinColumn(name = "event_id")
     private Event event;
 
+    @ManyToOne
+    @JoinColumn(name = "account_id")
+    private Account account;
+
     private Category category;
 
     private LocalDateTime createdDate;

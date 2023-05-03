@@ -30,3 +30,10 @@ databaseChangeLog:
                     foreignKeyName: event_article_fk
                     referencedTableName: event
                     referencedColumnNames: id
+              - column:
+                  name: account_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: account_article_fk
+                    referencedTableName: account
+                    referencedColumnNames: id
