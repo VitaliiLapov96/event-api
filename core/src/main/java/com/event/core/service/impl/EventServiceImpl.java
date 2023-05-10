@@ -67,6 +67,17 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    public List<EventDto> saveAll(List<EventDto> eventsDto) {
+        List<Event> events = EventMapper.INSTANCE.eventDtoListMapToEventList(eventsDto);
+
+        List<Event> savedEvents = eventRepository.saveAll(events);
+        log.info("Save EVENT list: size [{}]", savedEvents.size());
+        log.debug("Save EVENT list: {}", savedEvents);
+
+        return EventMapper.INSTANCE.eventListMapToEventDtoList(savedEvents);
+    }
+
+    @Override
     public void deleteById(long id) {
         eventRepository.deleteById(id);
         log.info("Delete EVENT by id: [{}]", id);

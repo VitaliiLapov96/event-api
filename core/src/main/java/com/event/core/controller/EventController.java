@@ -1,10 +1,13 @@
 package com.event.core.controller;
 
+import com.event.core.client.DataGeneratorClient;
 import com.event.core.controller.api.EventApi;
 import com.event.core.dto.EventDto;
 import com.event.core.service.EventService;
 import com.netflix.servo.annotations.Monitor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -14,6 +17,7 @@ import java.util.List;
 public class EventController implements EventApi {
 
     private final EventService eventService;
+    private final DataGeneratorClient dataGeneratorClient;
 
     @Monitor(name = "createEventCounter")
     @Override
@@ -50,6 +54,13 @@ public class EventController implements EventApi {
     @Override
     public void deleteEvent(long id) {
         eventService.deleteById(id);
+    }
+
+    @Override
+    public List<EventDto> generateEventList(int amount) {
+        List<EventDto> eventDtoList = dataGeneratorClient.generateEventList(amount);
+
+        return eventService.saveAll(eventDtoList);
     }
 
 }

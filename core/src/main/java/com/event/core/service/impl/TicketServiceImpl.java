@@ -80,6 +80,17 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
+    public List<TicketDto> saveAll(List<TicketDto> ticketsDto) {
+        List<Ticket> tickets = TicketMapper.INSTANCE.ticketDtoListMapToTicketList(ticketsDto);
+
+        List<Ticket> savedTickets = ticketRepository.saveAll(tickets);
+        log.info("Save TICKET list: size [{}]", savedTickets.size());
+        log.debug("Save TICKET list: {}", savedTickets);
+
+        return TicketMapper.INSTANCE.ticketListMapToTicketDtoList(savedTickets);
+    }
+
+    @Override
     public void deleteById(long id) {
         ticketRepository.deleteById(id);
         log.info("Delete TICKET by id: [{}]", id);

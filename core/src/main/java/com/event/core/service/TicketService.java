@@ -16,5 +16,7 @@ public interface TicketService {
 
     List<TicketDto> findAllByEventId(long eventId);
 
+    List<TicketDto> saveAll(List<TicketDto> ticketsDto);
+
     void deleteById(long id);
 }

@@ -1,6 +1,8 @@
 package com.event.core.controller;
 
+import com.event.core.client.DataGeneratorClient;
 import com.event.core.controller.api.TicketApi;
+import com.event.core.dto.EventDto;
 import com.event.core.dto.TicketDto;
 import com.event.core.service.TicketService;
 import com.netflix.servo.annotations.Monitor;
@@ -14,6 +16,7 @@ import java.util.List;
 public class TicketController implements TicketApi {
 
     private final TicketService ticketService;
+    private final DataGeneratorClient dataGeneratorClient;
 
     @Monitor(name = "createTicketCounter")
     @Override
@@ -49,5 +52,12 @@ public class TicketController implements TicketApi {
     @Override
     public void deleteTicket(long id) {
         ticketService.deleteById(id);
+    }
+
+    @Override
+    public List<TicketDto> generateTicketList(int amount, EventDto eventDto) {
+        List<TicketDto> ticketsDto = dataGeneratorClient.generateTicketList(amount, eventDto);
+
+        return ticketService.saveAll(ticketsDto);
     }
 }
