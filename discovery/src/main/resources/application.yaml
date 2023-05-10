@@ -1,13 +1,15 @@
+#App name configuration
 spring:
   application:
     name: discovery
 
-#Spring configuration
-server:
-  port: 8761
+  cloud:
+    config:
+      import: ${CONFIG_SERVER_URL}
 
-#Eureka configuration
-eureka:
-  client:
-    registerWithEureka: false
-    fetchRegistry: false
+#Actuator configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'

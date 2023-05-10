@@ -35,6 +35,8 @@
         <module>core</module>
         <module>discovery</module>
         <module>apigateway</module>
+        <module>config</module>
+        <module>data-generator</module>
     </modules>
 
     <dependencyManagement>

@@ -1,21 +1,13 @@
-#Spring configuration
-server:
-  port: 8764
-
-#App name configuration
+#App name/Config server configuration
 spring:
   application:
-    name: apigateway
+    name: api-gateway
+  config:
+    import: ${CONFIG_SERVER_URL}
 
-#Zuul configuration
-zuul:
-  routes:
-    event-app:
-      path: /event-app/**
-      url: http://localhost:8080/event-app
-
-#Eureka configuration
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: ${EUREKA_URL}
+#Actuator configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'

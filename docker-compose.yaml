@@ -11,12 +11,26 @@ services:
     ports:
       - "2003:2003"
 
+  config:
+    image: 'config:latest'
+    build:
+      context: ./config
+      dockerfile: Dockerfile
+    container_name: config
+    environment:
+      - EUREKA_URL=http://discovery:8761/eureka
+      - APP_CONFIG_REPO=https://github.com/VitaliiLapov96/application-config-repo.git
+    ports:
+      - "8765:8765"
+
   discovery:
     image: 'discovery:latest'
     build:
       context: ./discovery
       dockerfile: Dockerfile
     container_name: discovery
+    environment:
+      - CONFIG_SERVER_URL=configserver:http://localhost:8765
     ports:
       - "8761:8761"
 
@@ -28,6 +42,7 @@ services:
     container_name: apigateway
     environment:
       - EUREKA_URL=http://discovery:8761/eureka
+      - CONFIG_SERVER_URL=configserver:http://localhost:8765
     ports:
       - "8764:8764"
     depends_on:
@@ -51,6 +66,7 @@ services:
       - USERNAME=postgres
       - PASSWORD=postgres
       - EUREKA_URL=http://discovery:8761/eureka
+      - CONFIG_SERVER_URL=configserver:http://localhost:8765
 
   db:
     image: 'postgres:13.1-alpine'
