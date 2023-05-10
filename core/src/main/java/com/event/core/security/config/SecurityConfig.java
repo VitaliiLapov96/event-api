@@ -28,18 +28,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf().disable()
                 .authorizeHttpRequests()
-                .mvcMatchers("/register", "/login", "/logout")
-                .permitAll()
+                .antMatchers("/event/**", "/ticket/**").hasAnyAuthority(Role.ADMIN.getValue())
+                .antMatchers(HttpMethod.GET, "/event/**", "/ticket/**").hasAnyAuthority(Role.USER.getValue())
+                .anyRequest().authenticated()
                 .and()
-                .authorizeHttpRequests()
-                .mvcMatchers("/event/**", "/ticket/**")
-                .hasAnyAuthority(Role.ADMIN.getValue())
+                .formLogin().permitAll()
                 .and()
-                .authorizeHttpRequests()
-                .mvcMatchers(HttpMethod.GET, "/event/**", "/ticket/**")
-                .hasAnyAuthority(Role.USER.getValue())
-                .and()
-                .formLogin()
+                .logout().permitAll()
                 .and()
                 .build();
     }
