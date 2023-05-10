@@ -1,28 +1,13 @@
-#Spring configuration
-server:
-  port: 8080
-  servlet:
-    context-path: /event-app
-
 #App name/Postgres configuration
 spring:
+  cloud:
+    import: configserver:http://localhost:8888
   application:
     name: event-app
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: ${MY_POSTGRES_URL}
-    username: ${USERNAME}
-    password: ${PASSWORD}
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
 
-#Eureka configuration
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: ${EUREKA_URL}
+#Actuator configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
