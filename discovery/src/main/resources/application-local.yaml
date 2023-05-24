@@ -1,0 +1,25 @@
+#App name configuration
+spring:
+  application:
+    name: discovery
+
+  cloud:
+    config:
+      import: configserver:http://localhost:8888
+
+#Spring configuration
+server:
+  port: 8761
+
+#Eureka configuration
+eureka:
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+
+#Actuator configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health

@@ -6,10 +6,3 @@ spring:
   cloud:
     config:
       import: ${CONFIG_SERVER_URL}
-
-#Actuator configuration
-management:
-  endpoints:
-    web:
-      exposure:
-        include: '*'
