@@ -10,7 +10,7 @@ spring:
     config:
       server:
         git:
-          uri: ${APP_CONFIG_REPO}
+          uri: https://github.com/VitaliiLapov96/application-config-repo.git
           skipSslValidation: true
           clone-on-start: true
 
@@ -18,7 +18,7 @@ spring:
 eureka:
   client:
     serviceUrl:
-      defaultZone: ${EUREKA_URL}
+      defaultZone: http://localhost:8761/eureka
 
 #Actuator configuration
 management:
