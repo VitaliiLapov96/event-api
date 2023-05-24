@@ -1,13 +1,7 @@
-#App name/Config server configuration
 spring:
   application:
     name: api-gateway
-  config:
+  cloud:
+    config:
+      fail-fast: true
     import: ${CONFIG_SERVER_URL}
-
-#Actuator configuration
-management:
-  endpoints:
-    web:
-      exposure:
-        include: '*'
