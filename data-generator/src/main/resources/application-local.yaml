@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: data-generator
+  cloud:
+    config:
+      fail-fast: true
+    import: configserver:http://config:8888
+
+#Spring configuration
+server:
+  port: 8081
+  servlet:
+    context-path: /data-generator
+
+##Eureka configuration
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+
+#Actuator configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
