@@ -4,10 +4,12 @@ import com.event.core.dto.TicketDto;
 import com.event.core.exception.EntityNotFoundException;
 import com.event.core.mapper.EventMapper;
 import com.event.core.mapper.TicketMapper;
+import com.event.core.model.Category;
 import com.event.core.model.Event;
 import com.event.core.model.Ticket;
 import com.event.core.repository.TicketRepository;
 import com.event.core.service.TicketService;
+import com.event.core.strategy.BuyTicket;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,7 @@ import java.util.List;
 public class TicketServiceImpl implements TicketService {
 
     private final TicketRepository ticketRepository;
+    private final List<BuyTicket> buyTicketStrategy;
 
     @Override
     public TicketDto create(TicketDto ticketDto) {
@@ -52,7 +55,24 @@ public class TicketServiceImpl implements TicketService {
 
         Event event = EventMapper.INSTANCE.eventDtoMapToEvent(ticketDto.getEvent());
         ticketToUpdate.setEvent(event);
-        ticketToUpdate.setCategory(ticketDto.getCategory());
+
+        Ticket updatedTicket = ticketRepository.save(ticketToUpdate);
+        log.info("Update TICKET with id: [{}]", updatedTicket.getId());
+        log.debug("Update TICKET: [{}]", updatedTicket);
+
+        return TicketMapper.INSTANCE.ticketMapToTicketDto(updatedTicket);
+    }
+
+    @Override
+    public TicketDto buy(long id, Category category) {
+        Ticket ticketToUpdate = ticketRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Ticket.class, id));
+
+        BuyTicket buyTicket = buyTicketStrategy.stream()
+                .filter(strategy -> strategy.getTicketStrategy().equals(category))
+                .findAny()
+                .orElseThrow();
+        buyTicket.buy(ticketToUpdate);
 
         Ticket updatedTicket = ticketRepository.save(ticketToUpdate);
         log.info("Update TICKET with id: [{}]", updatedTicket.getId());
