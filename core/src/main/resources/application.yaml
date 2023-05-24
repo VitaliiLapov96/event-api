@@ -1,13 +1,7 @@
-#App name/Postgres configuration
 spring:
-  cloud:
-    import: configserver:http://localhost:8888
   application:
     name: event-app
-
-#Actuator configuration
-management:
-  endpoints:
-    web:
-      exposure:
-        include: '*'
+  cloud:
+    config:
+      fail-fast: true
+    import: ${CONFIG_SERVER_URL}
