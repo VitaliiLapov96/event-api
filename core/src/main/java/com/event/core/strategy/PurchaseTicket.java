@@ -3,7 +3,7 @@ package com.event.core.strategy;
 import com.event.core.model.Category;
 import com.event.core.model.Ticket;
 
-public interface BuyTicket {
+public interface PurchaseTicket {
 
     void buy(Ticket ticket);
 

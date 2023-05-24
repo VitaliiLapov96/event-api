@@ -9,7 +9,8 @@ import com.event.core.model.Event;
 import com.event.core.model.Ticket;
 import com.event.core.repository.TicketRepository;
 import com.event.core.service.TicketService;
-import com.event.core.strategy.BuyTicket;
+import com.event.core.strategy.PurchaseTicket;
+import com.event.core.strategy.PurchaseTicketFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ import java.util.List;
 public class TicketServiceImpl implements TicketService {
 
     private final TicketRepository ticketRepository;
-    private final List<BuyTicket> buyTicketStrategy;
+    private final PurchaseTicketFactory purchaseTicketFactory;
 
     @Override
     public TicketDto create(TicketDto ticketDto) {
@@ -65,16 +66,13 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public TicketDto buy(long id, Category category) {
-        Ticket ticketToUpdate = ticketRepository.findById(id)
+        Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(Ticket.class, id));
 
-        BuyTicket buyTicket = buyTicketStrategy.stream()
-                .filter(strategy -> strategy.getTicketStrategy().equals(category))
-                .findAny()
-                .orElseThrow();
-        buyTicket.buy(ticketToUpdate);
+        PurchaseTicket purchaseTicketStrategy = purchaseTicketFactory.getPurchaseTicketStrategy(category);
+        purchaseTicketStrategy.buy(ticket);
 
-        Ticket updatedTicket = ticketRepository.save(ticketToUpdate);
+        Ticket updatedTicket = ticketRepository.save(ticket);
         log.info("Update TICKET with id: [{}]", updatedTicket.getId());
         log.debug("Update TICKET: [{}]", updatedTicket);
 
