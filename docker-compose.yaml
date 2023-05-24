@@ -21,7 +21,12 @@ services:
       - EUREKA_URL=http://discovery:8761/eureka
       - APP_CONFIG_REPO=https://github.com/VitaliiLapov96/application-config-repo.git
     ports:
-      - "8765:8765"
+      - "8888:8888"
+    restart: always
+    healthcheck:
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   discovery:
     image: 'discovery:latest'
@@ -29,12 +34,18 @@ services:
       context: ./discovery
       dockerfile: Dockerfile
     container_name: discovery
-    environment:
-      - CONFIG_SERVER_URL=configserver:http://localhost:8765
+    restart: always
     ports:
       - "8761:8761"
+    depends_on:
+      - config
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://config:8888/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  apigateway:
+  api-gateway:
     image: 'apigateway:latest'
     build:
       context: ./apigateway
@@ -42,11 +53,17 @@ services:
     container_name: apigateway
     environment:
       - EUREKA_URL=http://discovery:8761/eureka
-      - CONFIG_SERVER_URL=configserver:http://localhost:8765
     ports:
       - "8764:8764"
     depends_on:
+      - config
       - discovery
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://api-gateway:8764/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   event-app:
     image: 'event-core:latest'
@@ -57,8 +74,10 @@ services:
     ports:
       - "8080:8080"
     depends_on:
+      - config
       - db
       - discovery
+      - api-gateway
       - zipkin
       - graphite
     environment:
@@ -66,26 +85,43 @@ services:
       - USERNAME=postgres
       - PASSWORD=postgres
       - EUREKA_URL=http://discovery:8761/eureka
-      - CONFIG_SERVER_URL=configserver:http://localhost:8765
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://event-app:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   db:
     image: 'postgres:13.1-alpine'
     container_name: db
     ports:
-      - "8081:8080"
+      - "8082:8082"
+    restart: always
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=Root123
       - POSTGRES_DB=events
 
-#  discovery:
-#    build: ../event-app/discovery/target/docker
-#    ports:
-#      - "8761:8761"
-#
-#  apigateway:
-#    build: ../event-app/apigateway/target/docker
-#    ports:
-#      - "8764:8764"
-#    links:
-#      - discovery
+  data-generator:
+    image: 'data-generator:latest'
+    build:
+      context: ./data-generator
+      dockerfile: Dockerfile
+    container_name: data-generator
+    ports:
+      - "8081:8081"
+    depends_on:
+      - config
+      - discovery
+      - api-gateway
+      - zipkin
+      - graphite
+    environment:
+      - EUREKA_URL=http://discovery:8761/eureka
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://data-generator:8081/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
