@@ -10,7 +10,7 @@ import com.event.core.model.Ticket;
 import com.event.core.repository.TicketRepository;
 import com.event.core.service.TicketService;
 import com.event.core.strategy.PurchaseTicket;
-import com.event.core.strategy.PurchaseTicketFactory;
+import com.event.core.strategy.StrategyConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ import java.util.List;
 public class TicketServiceImpl implements TicketService {
 
     private final TicketRepository ticketRepository;
-    private final PurchaseTicketFactory purchaseTicketFactory;
+    private final StrategyConfig strategy;
 
     @Override
     public TicketDto create(TicketDto ticketDto) {
@@ -69,7 +69,7 @@ public class TicketServiceImpl implements TicketService {
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(Ticket.class, id));
 
-        PurchaseTicket purchaseTicketStrategy = purchaseTicketFactory.getPurchaseTicketStrategy(category);
+        PurchaseTicket purchaseTicketStrategy = strategy.purchaseTicketMap().get(category);
         purchaseTicketStrategy.buy(ticket);
 
         Ticket updatedTicket = ticketRepository.save(ticket);
