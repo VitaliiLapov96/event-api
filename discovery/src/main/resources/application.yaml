@@ -1,8 +1,6 @@
-#App name configuration
+#App name/Config Server connect configuration
 spring:
   application:
     name: discovery
-
-  cloud:
-    config:
-      import: ${CONFIG_SERVER_URL}
+  config:
+    import: ${CONFIG_SERVER_URL}

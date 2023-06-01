@@ -1,7 +1,6 @@
+#App name/Config Server connect configuration
 spring:
   application:
     name: api-gateway
-  cloud:
-    config:
-      fail-fast: true
+  config:
     import: ${CONFIG_SERVER_URL}
