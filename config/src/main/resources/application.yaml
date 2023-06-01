@@ -14,12 +14,6 @@ spring:
           skipSslValidation: true
           clone-on-start: true
 
-#Eureka configuration
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: ${EUREKA_URL}
-
 #Actuator configuration
 management:
   endpoints:
