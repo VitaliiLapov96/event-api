@@ -1,4 +1,4 @@
-version: '2'
+version: '2.1'
 
 services:
   zipkin:
@@ -18,13 +18,13 @@ services:
       dockerfile: Dockerfile
     container_name: config
     environment:
-      - EUREKA_URL=http://discovery:8761/eureka
       - APP_CONFIG_REPO=https://github.com/VitaliiLapov96/application-config-repo.git
     ports:
       - "8888:8888"
-    restart: always
+    restart: on-failure
     healthcheck:
-      interval: 10s
+      test: ["CMD", "curl", "-f", "http://config:8888/actuator/health"]
+      interval: 5s
       timeout: 5s
       retries: 5
 
@@ -34,16 +34,19 @@ services:
       context: ./discovery
       dockerfile: Dockerfile
     container_name: discovery
-    restart: always
+    environment:
+      - CONFIG_SERVER_URL=optional:configserver:http://config:8888
     ports:
       - "8761:8761"
-    depends_on:
-      - config
+    restart: on-failure
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://config:8888/health || exit 1"]
-      interval: 10s
+      test: ["CMD", "curl", "-f", "http://discovery:8761/actuator/health"]
+      interval: 5s
       timeout: 5s
       retries: 5
+    depends_on:
+      config:
+        condition: service_healthy
 
   api-gateway:
     image: 'apigateway:latest'
@@ -52,56 +55,50 @@ services:
       dockerfile: Dockerfile
     container_name: apigateway
     environment:
+      - CONFIG_SERVER_URL=optional:configserver:http://config:8888
       - EUREKA_URL=http://discovery:8761/eureka
     ports:
       - "8764:8764"
-    depends_on:
-      - config
-      - discovery
-    restart: always
+    restart: on-failure
     healthcheck:
       test: ["CMD", "curl", "-f", "http://api-gateway:8764/actuator/health"]
-      interval: 10s
+      interval: 5s
       timeout: 5s
       retries: 5
+    depends_on:
+      discovery:
+        condition: service_healthy
 
   event-app:
     image: 'event-core:latest'
     build:
       context: ./core
       dockerfile: Dockerfile
-    container_name: event-core
+    container_name: event-app
     ports:
       - "8080:8080"
-    depends_on:
-      - config
-      - db
-      - discovery
-      - api-gateway
-      - zipkin
-      - graphite
     environment:
-      - MY_POSTGRES_URL=jdbc:postgresql://db:5432/events
-      - USERNAME=postgres
-      - PASSWORD=postgres
+      - CONFIG_SERVER_URL=optional:configserver:http://config:8888
       - EUREKA_URL=http://discovery:8761/eureka
-    restart: always
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://event-app:8080/actuator/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - MY_POSTGRES_URL=jdbc:postgresql://db:5432/events
+      - USERNAME=root
+      - PASSWORD=Root123
+      - ZIPKIN_SERVER_URL=http://zipkin:9411
+    restart: on-failure
+    depends_on:
+      api-gateway:
+        condition: service_healthy
 
   db:
     image: 'postgres:13.1-alpine'
     container_name: db
     ports:
       - "8082:8082"
-    restart: always
     environment:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=Root123
       - POSTGRES_DB=events
+    restart: on-failure
 
   data-generator:
     image: 'data-generator:latest'
@@ -111,17 +108,11 @@ services:
     container_name: data-generator
     ports:
       - "8081:8081"
-    depends_on:
-      - config
-      - discovery
-      - api-gateway
-      - zipkin
-      - graphite
     environment:
+      - CONFIG_SERVER_URL=optional:configserver:http://config:8888
       - EUREKA_URL=http://discovery:8761/eureka
-    restart: always
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://data-generator:8081/actuator/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - ZIPKIN_SERVER_URL=http://zipkin:9411
+    restart: on-failure
+    depends_on:
+      api-gateway:
+        condition: service_healthy
