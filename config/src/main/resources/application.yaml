@@ -1,0 +1,22 @@
+#Spring configuration
+server:
+  port: 8888
+
+#App name/Config server configuration
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: ${APP_CONFIG_REPO}
+          skipSslValidation: true
+          clone-on-start: true
+
+#Actuator configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health

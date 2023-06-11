@@ -14,6 +14,8 @@ public class TicketDto {
 
     private EventDto event;
 
+    private AccountDto account;
+
     private Category category;
 
     private LocalDateTime createdDate;

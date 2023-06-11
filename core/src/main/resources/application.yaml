@@ -1,18 +1,6 @@
-#Spring configuration
-server:
-  port: 8080
-
-#MySQL configuration
+#App name/Config Server connect configuration
 spring:
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: ${MY_POSTGRES_URL}
-    username: ${USERNAME}
-    password: ${PASSWORD}
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQL81Dialect
+  application:
+    name: event-app
+  config:
+    import: ${CONFIG_SERVER_URL}

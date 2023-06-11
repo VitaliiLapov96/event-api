@@ -1,0 +1,28 @@
+#Spring configuration
+server:
+  port: 8888
+
+#App name/Config server configuration
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/VitaliiLapov96/application-config-repo.git
+          skipSslValidation: true
+          clone-on-start: true
+
+#Eureka configuration
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+
+#Actuator configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
