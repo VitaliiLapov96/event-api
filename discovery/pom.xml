@@ -44,28 +44,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <!--            <plugin>-->
-            <!--                <groupId>org.codehaus.mojo</groupId>-->
-            <!--                <artifactId>build-helper-maven-plugin</artifactId>-->
-            <!--                <executions>-->
-            <!--                    <execution>-->
-            <!--                        <id>add-source</id>-->
-            <!--                        <phase>generate-sources</phase>-->
-            <!--                        <goals>-->
-            <!--                            <goal>add-resource</goal>-->
-            <!--                        </goals>-->
-            <!--                        <configuration>-->
-            <!--                            <resources>-->
-            <!--                                <resource>-->
-            <!--                                    <directory>${project.basedir}/docker/springboot-app</directory>-->
-            <!--                                    <targetPath>${project.build.directory}/docker</targetPath>-->
-            <!--                                    <filtering>true</filtering>-->
-            <!--                                </resource>-->
-            <!--                            </resources>-->
-            <!--                        </configuration>-->
-            <!--                    </execution>-->
-            <!--                </executions>-->
-            <!--            </plugin>-->
         </plugins>
     </build>
 
