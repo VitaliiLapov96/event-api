@@ -26,11 +26,6 @@ pipeline {
                 sh 'docker push vetal96/event-core'
             }
         }
-        post {
-            always {
-                sh 'docker logout'
-            }
-        }
 
         stage('Push to Docker Hub') {
             steps {
@@ -39,22 +34,12 @@ pipeline {
                 sh 'docker push vetal96/event-core'
             }
         }
-        post {
-            always {
-                sh 'docker logout'
-            }
-        }
 
         stage('Deploy') {
             steps {
                 sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
                 sh 'docker pull vetal96/event-core'
                 sh 'docker run -d -p 8080:8080 vetal96/event-core'
-            }
-        }
-        post {
-            always {
-                sh 'docker logout'
             }
         }
 
