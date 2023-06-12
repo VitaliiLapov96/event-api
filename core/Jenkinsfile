@@ -15,8 +15,8 @@ pipeline {
         stage('Build') {
             steps {
                 tools {
-                    jdk 'your-installed-jdk'
-                    maven 'your-installed-maven'
+                    jdk 'jdk8'
+                    maven 'maven3'
                 }
                 sh 'mvn clean package'
             }
