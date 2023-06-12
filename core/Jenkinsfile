@@ -7,11 +7,6 @@ pipeline {
 //     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/VitaliiLapov96/event-api.git'
-            }
-        }
         stage('Build') {
             steps {
                 sh 'mvn clean package'
