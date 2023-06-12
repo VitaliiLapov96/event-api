@@ -5,10 +5,6 @@ pipeline {
 //     environment {
 //         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
 //     }
-    tools {
-        jdk 'jdk8'
-        maven 'maven3'
-    }
 
     stages {
         stage('Checkout') {
