@@ -7,8 +7,17 @@ pipeline {
 //     }
 
     stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/VitaliiLapov96/event-api.git'
+            }
+        }
         stage('Build') {
             steps {
+                tools {
+                    jdk 'your-installed-jdk'
+                    maven 'your-installed-maven'
+                }
                 sh 'mvn clean package'
             }
         }
