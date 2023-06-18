@@ -1,47 +1,19 @@
 pipeline {
 
     agent any
-//
-//     environment {
-//         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
-//     }
+
+    parameters {
+        string(name: 'jobName', defaultValue: 'release', description: 'The name of the build job')
+    }
 
     stages {
         stage('Build') {
             steps {
-                sh 'mvn clean package'
+                script {
+                    echo "The build job name is ${params.jobName}"
+                    build job: "${params.jobName}"
+                }
             }
         }
-
-        stage('Test') {
-            steps {
-                sh 'mvn test'
-            }
-        }
-
-//         stage('Push to Docker Hub') {
-//             steps {
-//                 sh 'docker build -t vetal96/event-core .'
-//                 sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-//                 sh 'docker push vetal96/event-core'
-//             }
-//         }
-//
-//         stage('Push to Docker Hub') {
-//             steps {
-//                 sh 'docker build -t vetal96/event-core .'
-//                 sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-//                 sh 'docker push vetal96/event-core'
-//             }
-//         }
-//
-//         stage('Deploy') {
-//             steps {
-//                 sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-//                 sh 'docker pull vetal96/event-core'
-//                 sh 'docker run -d -p 8080:8080 vetal96/event-core'
-//             }
-//         }
-
     }
 }
