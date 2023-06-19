@@ -3,7 +3,12 @@ pipeline {
     agent any
 
     parameters {
-        string(name: 'jobName', defaultValue: 'release', description: 'The name of the build job')
+        extendedChoice(name: 'jobName', description: 'Select the job name', 
+            type: 'PT_SINGLE_SELECT', 
+            groovyScript: """
+                return ['release', 'continuous', 'deploy', 'deploy_cloud', 'delivery_pipeline']
+            """
+        )
     }
 
     stages {
